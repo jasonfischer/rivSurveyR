@@ -1,6 +1,6 @@
 #' heading
 #'
-#' Calculates the heading in degrees of two velocities
+#' Calculates the degree heading of two velocity vectors
 #' @param ve	A vector of velocities to the east.
 #' @param vn	A vector of velocities to the north. Must be the same length as ve
 #' @return	A vector the same length as \code{ve}.
