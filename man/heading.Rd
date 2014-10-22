@@ -15,7 +15,7 @@ heading(ve, vn)
 A vector the same length as \code{ve}.
 }
 \description{
-Calculates the heading in degrees of two velocities
+Calculates the degree heading of two velocity vectors
 }
 \examples{
 heading(rnorm(5), rnorm(5))
