@@ -7,6 +7,9 @@
 #' @export
 #' @examples
 #' heading(rnorm(5), rnorm(5))
+#' easting <- c(0,1,1,1,0,-1,-1,-1)
+#' northing <- c(1,1,0,-1,-1,-1,0,1)
+#' heading(easting,northing)
 
 heading <- function(ve, vn) {
   direction <- atan(abs(ve)/abs(vn)) * 180/pi
