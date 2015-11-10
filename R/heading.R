@@ -12,12 +12,7 @@
 #' heading(easting,northing)
 
 heading <- function(ve, vn) {
-  direction <- atan(abs(ve)/abs(vn)) * 180/pi
-  for (i in seq_along(direction)) {
-    switch(ve[i] > 0 & vn[i] < 0, direction[i] <- 180 - direction[i])
-    switch(ve[i] <= 0 & vn[i] < 0, direction[i] <- direction[i] + 180)
-    switch(ve[i] < 0 & vn[i] > 0,   direction[i] <- 90 - direction[i] + 270)
-    switch(ve[i] < 0 & vn[i] == 0, direction[i] <- 270)  	
-  }
+  direction <- atan2(ve, vn) * 180/pi
+  direction[which(direction < 0)] <- direction[which(direction < 0)] + 360
   return(direction)
-} 
+}
