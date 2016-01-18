@@ -5,8 +5,8 @@
 \title{average.planform}
 \usage{
 average.planform(data, transectNames, FUN = mean, binWidth,
-  layerReference = "surface", x1 = "minimum", x2 = "maximum",
-  project = TRUE)
+  depthReference = "unit", layerReference = "surface", x1 = "minimum",
+  x2 = "maximum", project = TRUE)
 }
 \arguments{
 \item{data}{Either a list of MATLAB files exported from RiverSurveyor to be compiled or an object of class "adcp.planform".}
@@ -16,6 +16,8 @@ average.planform(data, transectNames, FUN = mean, binWidth,
 \item{FUN}{Function used to summarize ADCP data, default is \link{mean}}
 
 \item{binWidth}{Width used to bin data along a transect, for summarization. Default is the mean distance between samples.}
+
+\item{depthReference}{Defines the depth measurements to be used. The default ("unit") uses the method defined in RiverSurveyor, but \code{depthReference} can be set to use measurements from the vertical beam ("VB"), bottom-track beams ("BT"), or both ("composite").}
 
 \item{layerReference}{Defines layerAvg bounds x1 and x2 as a distance from surface ("surface", default), distance above bottom ("bottom"), or percent of total depth ("percent").}
 

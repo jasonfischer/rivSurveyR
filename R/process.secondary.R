@@ -3,6 +3,7 @@
 #' Summarizes ADCP cell data exported from SonTek RiverSurveyor, calculates primary and secondary velocities, and conducts spatial averaging.
 #' @param data	A list of MATLAB files exported from RiverSurveyor to be compiled
 #' @param transectNames	A list of transect names corresponding to the transects represented by the MATLAB files. See 'details' for additional information.
+#' @param depthReference	Defines the depth measurements to be used. The default ("unit") uses the method defined in RiverSurveyor, but \code{depthReference} can be set to use measurements from the vertical beam ("VB"), bottom-track beams ("BT"), or both ("composite").
 #' @param project	Logical.  If TRUE (default), transect replicates are projected to a mean transect line using an orthogonal projection of the x and y coordinates. If FALSE transects are not projected to a mean transect line.
 #' @param FUN	function used to summarize ADCP data, default is \code{mean}
 #' @param binWidth	Width used to bin data along a transect, for summarization. Default is the mean distance between samples.
@@ -27,14 +28,14 @@
 #' adcp.secondary <- process.secondary(mNine, tNames, rotation = c("xSec", "rozovskii", "zeroSecQ"), xWindow = 21, yWindow = 5)
 #' @seealso	\link{average.secondary}, \link{xSec}, \link{rozovskii}, \link{zeroSecQ}, \link{spatialAverage} and \link{spatialSD}.
 
-process.secondary <- function(data, transectNames, project = TRUE, FUN = "mean", binWidth, binHeight, 
+process.secondary <- function(data, transectNames, depthReference = "unit", project = TRUE, FUN = "mean", binWidth, binHeight, 
                               rotation = c("xSec"), 
                               xWindow = NULL, yWindow, spatialCoords = c("tDist","cellDepth"),
                               groups = "transectName", na.ignore = FALSE, spatialAvg = "TRUE", spatialStdDev = "FALSE") {
   message("Compiling and Averaging Data")
   flush.console()
   #pass data to average planform
-  ADCP <- average.secondary(data = data, transectNames = transectNames, project = project, binWidth = binWidth, binHeight = binHeight, FUN = FUN)
+  ADCP <- average.secondary(data = data, transectNames = transectNames, depthReference = depthReference, project = project, binWidth = binWidth, binHeight = binHeight, FUN = FUN)
   
   ADCP <- ADCP[order(ADCP$transectName, ADCP$tDist, ADCP$cellDepth),]
   

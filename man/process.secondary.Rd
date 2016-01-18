@@ -4,15 +4,18 @@
 \alias{process.secondary}
 \title{process.secondary}
 \usage{
-process.secondary(data, transectNames, project = TRUE, FUN = "mean",
-  binWidth, binHeight, rotation = c("xSec"), xWindow = NULL, yWindow,
-  spatialCoords = c("tDist", "cellDepth"), groups = "transectName",
-  na.ignore = FALSE, spatialAvg = "TRUE", spatialStdDev = "FALSE")
+process.secondary(data, transectNames, depthReference = "unit",
+  project = TRUE, FUN = "mean", binWidth, binHeight, rotation = c("xSec"),
+  xWindow = NULL, yWindow, spatialCoords = c("tDist", "cellDepth"),
+  groups = "transectName", na.ignore = FALSE, spatialAvg = "TRUE",
+  spatialStdDev = "FALSE")
 }
 \arguments{
 \item{data}{A list of MATLAB files exported from RiverSurveyor to be compiled}
 
 \item{transectNames}{A list of transect names corresponding to the transects represented by the MATLAB files. See 'details' for additional information.}
+
+\item{depthReference}{Defines the depth measurements to be used. The default ("unit") uses the method defined in RiverSurveyor, but \code{depthReference} can be set to use measurements from the vertical beam ("VB"), bottom-track beams ("BT"), or both ("composite").}
 
 \item{project}{Logical.  If TRUE (default), transect replicates are projected to a mean transect line using an orthogonal projection of the x and y coordinates. If FALSE transects are not projected to a mean transect line.}
 

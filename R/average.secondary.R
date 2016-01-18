@@ -3,6 +3,7 @@
 #' Applies a function summarizing replicated ADCP data and calculates transect direction (from river right) and distance along transect.
 #' @param data	Either a list of MATLAB files exported from RiverSurveyor to be compiled or an object of class "adcp.planform".
 #' @param transectNames	A list of transect names corresponding to the transects represented by the MATLAB files. See 'details' for additional information.
+#' @param depthReference	Defines the depth measurements to be used. The default ("unit") uses the method defined in RiverSurveyor, but \code{depthReference} can be set to use measurements from the vertical beam ("VB"), bottom-track beams ("BT"), or both ("composite").
 #' @param FUN	Function used to summarize ADCP data, default is \link{mean}
 #' @param binWidth	Width used to bin data along a transect, for summarization. Default is the mean distance between samples.
 #' @param binHeight	Depth interval used to bin data within an ensemble, for summarization. If missing, cell depth is used group cells for summarization.
@@ -19,12 +20,12 @@
 #' average.secondary(mNine, tNames)
 #' @seealso	\link{xSec.secondary} and \link{transectHeading}.
  
-average.secondary <- function(data, transectNames, project = TRUE, binWidth, binHeight, FUN = mean){
+average.secondary <- function(data, transectNames, depthReference = "unit", project = TRUE, binWidth, binHeight, FUN = mean){
   #if data passed to average.secondary is class adcp.secondary (indicating it has been processed by xSec.secondary), proceed to summarization, otherwise, data is passed to xSec.secondary
   if("adcp.secondary" %in% class(data)){
     x <- data
   } else if(is.list(data) == TRUE){
-    x <- xSec.secondary(data, transectNames = transectNames, project = project)
+    x <- xSec.secondary(data, transectNames = transectNames, depthReference = depthReference, project = project)
   } else {
     stop("data must be list of objects from RiverSurveyor .mat output or of class adcp.secondary")
   }

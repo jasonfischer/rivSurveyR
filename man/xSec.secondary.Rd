@@ -4,10 +4,12 @@
 \alias{xSec.secondary}
 \title{xSec.secondary}
 \usage{
-xSec.secondary(data, transectNames, project = TRUE)
+xSec.secondary(data, depthReference = "unit", transectNames, project = TRUE)
 }
 \arguments{
 \item{data}{A list of MATLAB files exported from RiverSurveyor to be compiled}
+
+\item{depthReference}{Defines the depth measurements to be used. The default ("unit") uses the method defined in RiverSurveyor, but \code{depthReference} can be set to use measurements from the vertical beam ("VB"), bottom-track beams ("BT"), or both ("composite").}
 
 \item{transectNames}{A list of transect names corresponding to the transects represented by the MATLAB files. See 'details' for additional information.}
 

@@ -3,6 +3,7 @@
 #' Compiles planform ADCP data exported from SonTek RiverSurveyor as MATLAB file into an object of class "adcp.planform" which inherits from data.table
 #' @param data	A list of MATLAB files exported from RiverSurveyor to be compiled
 #' @param transectNames	A list of transect names corresponding to the transects represented by the MATLAB files. See 'details' for additional information.
+#' @param depthReference	Defines the depth measurements to be used. The default ("unit") uses the method defined in RiverSurveyor, but \code{depthReference} can be set to use measurements from the vertical beam ("VB"), bottom-track beams ("BT"), or both ("composite").
 #' @param layerReference	Defines layerAvg bounds x1 and x2 as a distance from surface ("surface", default), distance above bottom ("bottom"), or percent of total depth ("percent"). If \code{layerReference} is "bottom" x1 and x2 are reversed.
 #' @param x1	Lower bound velocities are averaged over. Either a numeric representing a depth or percentage or a character where "minimum" equals the minimum distance from the reference point (i.e., 0 when \code{layerReference} = "surface" and bottomCellDepth when \code{layerReference} = "bottom") and "maximum" equals maximum distance from the reference point. Must be numeric if \code{layerReference} = "percent". Defaults to "minimum".
 #' @param x2	Upper bound velocities are averaged over. Either a numeric representing a depth or percentage or a character where "minimum" equals the minimum distance from the reference point (i.e., 0 when \code{layerReference} = "surface" and bottomCellDepth when \code{layerReference} = "bottom") and "maximum" equals maximum distance from the reference point. Must be numeric if \code{layerReference} = "percent". Defaults to "maximum".
@@ -21,7 +22,7 @@
 #' xSec.planform(mNine, tNames, layerReference = "bottom", x1 = 1, x2 = "minimum")
 #' @seealso	\link{layerAvg} and \link{project.transect}
  
-xSec.planform <- function(data, transectNames, layerReference = "surface", x1 = "minimum", x2 = "maximum", project = TRUE){
+xSec.planform <- function(data, transectNames, depthReference = "unit", layerReference = "surface", x1 = "minimum", x2 = "maximum", project = TRUE){
   if(missing(transectNames) == TRUE){
     transectNames <- as.list(as.character(seq_along(data)))
   } else {
@@ -43,11 +44,23 @@ xSec.planform <- function(data, transectNames, layerReference = "surface", x1 = 
     transect <- data[[i]]    
     meanVel <- data.frame(transect[[6]][10,,1][[1]])
     names(meanVel) <- c("Mean.Vel.E", "Mean.Vel.N")
-    #if the depth reference used is vertical beam, extract vertical beam data, otherwise, bottom track depth data are extracted
-    if(transect[[1]][7,,1][[1]] == 0){
+    #pull out depth data measured with the vertical beam, bottom track mode, or both, based on user defined depthReference
+    if(depthReference == "unit"){
+      if(transect[[1]][7,,1][[1]] == 0){
+        depth <- transect[[7]][1,,1][[1]]
+      } else if(transect[[1]][7,,1][[1]] == 1){
+        depth <- transect[[7]][2,,1][[1]]
+      } else {
+        depth <- transect[[6]][7,,1][[1]]
+      }
+    } else if(depthReference == "VB"){
       depth <- transect[[7]][1,,1][[1]]
-    } else {
+    } else if(depthReference == "BT"){
       depth <- transect[[7]][2,,1][[1]]
+    } else if(depthReference == "composite"){
+      depth <- transect[[6]][7,,1][[1]]
+    } else {
+      stop("depthReference must either defined as unit, VB, BT, or composite")
     }
     gps <- data.frame(transect[[8]][1:2,,1][1:2], transect[[8]][7,,1][1],transect[[8]][11,,1][1])
     names(gps)[4:5] <- c("UTM_X", "UTM_Y")

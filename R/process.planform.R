@@ -5,6 +5,7 @@
 #' @param transectNames	A list of transect names corresponding to the transects represented by the MATLAB files. See 'details' for additional information.
 #' @param FUN	Function used to summarize ADCP data, default is \link{mean}
 #' @param binWidth	Width used to bin data along a transect, for summarization. Default is the mean distance between samples.
+#' @param depthReference	Defines the depth measurements to be used. The default ("unit") uses the method defined in RiverSurveyor, but \code{depthReference} can be set to use measurements from the vertical beam ("VB"), bottom-track beams ("BT"), or both ("composite").
 #' @param layerReference	Defines layerAvg bounds x1 and x2 as a distance from surface ("surface", default), distance above bottom ("bottom"), or percent of total depth ("percent").
 #' @param x1	Lower bound velocities are averaged over. Either a numeric representing a depth or percentage or a character where "minimum" equals the minimum distance from the reference point (i.e., 0 when \code{layerReference} = "surface" and bottomCellDepth when \code{layerReference} = "bottom") and "maximum" equals maximum distance from the reference point. Must be numeric if \code{layerReference} = "percent". Defaults to "minimum".
 #' @param x2	Upper bound velocities are averaged over. Either a numeric representing a depth or percentage or a character where "minimum" equals the minimum distance from the reference point (i.e., 0 when \code{layerReference} = "surface" and bottomCellDepth when \code{layerReference} = "bottom") and "maximum" equals maximum distance from the reference point. Must be numeric if \code{layerReference} = "percent". Defaults to "maximum".
@@ -32,14 +33,14 @@
 #' adcp.planform <- process.planform(mNine, tNames, Dc = 0.0375, n = 2, xWindow = 21)
 #' @seealso	\link{average.planform}, \link{shearVel}, \link{spatialAverage}, and \link{spatialSD}.
  
-process.planform <- function(data, transectNames, FUN = mean, binWidth, layerReference = "surface", x1 = "minimum", x2 = "maximum", project = TRUE,
+process.planform <- function(data, transectNames, FUN = mean, binWidth, depthReference = "unit", layerReference = "surface", x1 = "minimum", x2 = "maximum", project = TRUE,
                              Dc = NULL, n  = NULL, p = 1000, reference = "bottomCell", units = "metric",
                              spatialAvg = TRUE, spatialStdDev = FALSE,
                              xWindow = NULL, spatialCoords = c("tDist"), groups = c("transectName"), na.ignore = FALSE){  
   message("Compiling and Averaging Data")
   flush.console()
   #Pass data to average.planform
-  ADCP <- average.planform(data = data, transectNames = transectNames, FUN = FUN, binWidth = binWidth, layerReference = layerReference, x1 = x1, x2 = x2, project = project)
+  ADCP <- average.planform(data = data, transectNames = transectNames, FUN = FUN, binWidth = binWidth, depthReference = depthReference, layerReference = layerReference, x1 = x1, x2 = x2, project = project)
 
   ADCP <- ADCP[order(ADCP$transectName, ADCP$tDist),]
 

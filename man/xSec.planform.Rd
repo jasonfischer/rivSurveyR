@@ -4,13 +4,16 @@
 \alias{xSec.planform}
 \title{xSec.planform}
 \usage{
-xSec.planform(data, transectNames, layerReference = "surface",
-  x1 = "minimum", x2 = "maximum", project = TRUE)
+xSec.planform(data, transectNames, depthReference = "unit",
+  layerReference = "surface", x1 = "minimum", x2 = "maximum",
+  project = TRUE)
 }
 \arguments{
 \item{data}{A list of MATLAB files exported from RiverSurveyor to be compiled}
 
 \item{transectNames}{A list of transect names corresponding to the transects represented by the MATLAB files. See 'details' for additional information.}
+
+\item{depthReference}{Defines the depth measurements to be used. The default ("unit") uses the method defined in RiverSurveyor, but \code{depthReference} can be set to use measurements from the vertical beam ("VB"), bottom-track beams ("BT"), or both ("composite").}
 
 \item{layerReference}{Defines layerAvg bounds x1 and x2 as a distance from surface ("surface", default), distance above bottom ("bottom"), or percent of total depth ("percent"). If \code{layerReference} is "bottom" x1 and x2 are reversed.}
 

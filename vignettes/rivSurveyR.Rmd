@@ -1,7 +1,7 @@
 ---
 title: "Introduction to rivSurveyR"
 author: "Jason L. Fischer"
-date: 2015-11-2
+date: 2016-1-6
 output:
   rmarkdown::html_vignette:
     toc: yes
@@ -72,10 +72,10 @@ plot(planform$UTM_X_Proj, planform$UTM_Y_Proj, pch=20, cex=0.5, xlab="UTM X", yl
 plot(planform$UTM_X, planform$UTM_Y, pch=20, cex=0.5, xlab="UTM X", ylab="UTM Y", main="Without projection")
 ```
 
-This compiles the transects using the default settings, where layer averaged velocities correspond to the average velocity within the depth bounds of the ADCP measurements and data is projected to a mean transect line. However, if there is interest in water velocities within a meter from the bottom, setting the layerReference to "bottom" defines the bounds of x1 and x2 as the distance from the bottom. Setting x1 = 1 and keeping x2 = "minimum" ensures that the layer averaged velocities is the average of the velocities measured between the bottom and 1 meter off the bottom.
+This compiles the transects using the default settings, where the depth measurements used are those defined in RiverSurveyor prior to exporting MATLAB files, layer averaged velocities correspond to the average velocity within the depth bounds of the ADCP measurements, and data is projected to a mean transect line. However, if there is interest in water velocities within a meter from the bottom, setting the layerReference to "bottom" defines the bounds of x1 and x2 as the distance from the bottom. Setting x1 = 1 and keeping x2 = "minimum" ensures that the layer averaged velocities is the average of the velocities measured between the bottom and 1 meter off the bottom.
 
 ```{r, compile_ADCP2, results='hide', warning=FALSE}
-planform <- xSec.planform(mNine, tNames, "bottom", 1, "minimum")
+planform <- xSec.planform(mNine, tNames, "VB", "bottom", 1, "minimum")
 ```
 
 If x1 is greater than the maximum value of x, warnings will be produced, indicating that a NA was produced instead of a depth averaged velocity. If this is a concern, the value of x1 can be increased.
@@ -95,24 +95,23 @@ In addition to providing the mean for each set of replicates (from replicate tra
 Alternatively, a list of the transects imported into R and a list containing the names of those transects can be passed to `average.planform` and the first step can be skipped. Notice that many of the arguments are the same as those for `xSec.planform`, this is because if a list of transects is provided to the data argument, this information is passed to `xSec.planform` to be compiled before summarizing.
 
 ```{r, average_planform_alt, warning=FALSE}
-mean.planform.alt <- average.planform(mNine, tNames, layerReference="bottom", x1=1, x2="minimum")
+mean.planform.alt <- average.planform(mNine, tNames, depthReference="VB", layerReference="bottom", x1=1, x2="minimum")
 all.equal(mean.planform.alt, mean.planform)
 ```
 
 If the standard deviation is desired:
 
 ```{r, sd_planform, warning=FALSE}
-sd.planform <- average.planform(mNine, tNames, FUN = sd, layerReference="bottom", x1=1,
-                                x2="minimum")
+sd.planform <- average.planform(mNine, tNames, FUN = sd, depthReference="VB", layerReference="bottom", x1=1, x2="minimum")
 ```
 
 Another option provided by `average.planform` is the `binWidth` or cell width used to group samples for summarization. The default is to use the mean distance between samples, which is essentially the mean width of ensembles measured in a transect. However, if there is need to summarize samples over larger distances, the distance used can be set with `binWidth`. The larger the `binWidth` the quicker `average.planform` completes summarization.
 
 ```{r, binWidth, warning=FALSE}
-mean.planform.meter <- average.planform(mNine, tNames, binWidth=1, layerReference="bottom", x1=1,
+mean.planform.meter <- average.planform(mNine, tNames, binWidth=1, depthReference="VB", layerReference="bottom", x1=1,
                                         x2="minimum")
 nrow(mean.planform.meter)
-mean.planform.fiveMeter <- average.planform(mNine, tNames, binWidth=5, layerReference="bottom",
+mean.planform.fiveMeter <- average.planform(mNine, tNames, binWidth=5, depthReference="VB", layerReference="bottom",
                                             x1=1, x2="minimum")
 nrow(mean.planform.fiveMeter)
 ```
@@ -314,7 +313,8 @@ planform.ADCP.basic <- process.planform(mNine)
 If something other than the default is desired, data processing can be customized by specifying the arguments passed to `process.planform`. The code below produces the same output that was produced in the "Processing SonTek ADCP planform data step-by-step" section.
 
 ```{r, process_planform_specified, warning=FALSE}
-planform.ADCP <- process.planform(mNine, tNames, layerReference="bottom", x1=1, x2="minimum", 
+planform.ADCP <- process.planform(mNine, tNames, depthReference="VB", 
+                                  layerReference="bottom", x1=1, x2="minimum", 
                                   binWidth=1, Dc=0.0375, n=2, xWindow=20)
 all.equal(spatialMean.planform, planform.ADCP)
 ```

@@ -1,11 +1,11 @@
 Package: rivSurveyR
-Version: 0.1-0
-Date: 2015-11-2
+Version: 0.2-0
+Date: 2016-1-6
 Title: A Package to Process Water Velocities Collected With SonTek Acoustic Doppler Current Profilers
 Authors@R: person(given="Jason L.", family="Fischer", email="fisch133@gmail.com", role=c("aut", "cre"))
 Author: Jason L. Fischer [aut, cre]
 Maintainer: Jason L. Fischer <fisch133@gmail.com>
-Imports:
+Depends:
     R.matlab,
     R.utils,
     caTools,
@@ -13,8 +13,7 @@ Imports:
     lattice,
     latticeExtra,
     gstat,
-    sp
-Depends:
+    sp,
     R (>= 3.2.2)
 Description: The rivSurveyR package accepts acoustic Doppler current profiler (ADCP) data exported from SonTek's RiverSurveyor Live program as MATLAB files and allows quick summarization and plotting of water velocities.  It is capable of projecting replicate transects to a mean transect line and averaging measured values that overlap in geographic space.  Planform and secondary velocities from multiple ADCP transects can be processed at once and multiple rotation methods can be used to determine secondary velocities.  Planform flow data can be plotted in geographic space and cross-section plots of secondary velocities can easily be constructed.
 LazyData: TRUE

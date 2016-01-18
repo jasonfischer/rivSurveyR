@@ -3,6 +3,7 @@
 #' Compiles ADCP cell data exported from SonTek RiverSurveyor as MATLAB file into an object of class "adcp.secondary" which inherits from data.table
 #' @param data	A list of MATLAB files exported from RiverSurveyor to be compiled
 #' @param transectNames	A list of transect names corresponding to the transects represented by the MATLAB files. See 'details' for additional information.
+#' @param depthReference	Defines the depth measurements to be used. The default ("unit") uses the method defined in RiverSurveyor, but \code{depthReference} can be set to use measurements from the vertical beam ("VB"), bottom-track beams ("BT"), or both ("composite").
 #' @param project	Logical.  If TRUE (default), transect replicates are projected to a mean transect line using an orthogonal projection of the x and y coordinates. If FALSE transects are not projected to a mean transect line.
 #' @details	When assigning transectNames, order matters, the transect names must be in the same order of the MATLAB files assigned to the data argument. Ex., if the first two files in the list are Transect1a and Transect1b, which are replicates of Transect1, t first two files in the name list are "Transect1" and "Transect1".  The processing functions will spatially average and compile all data from the same transects, this tells the processing functions to average and compile these two files. Listing the names as "Transect1a" and "Transect1b" results in the transects being processed separately.  \code{transectNames} will only expect characters and names must be enclosed in "".
 #' @return	A \link[data.table]{data.table} with the transect name (transectName), cellID, depth averaged velocity to the east (Mean.Vel.E), depth averaged velocity to the north (Mean.Vel.N), depth, east velocity within a cell (Vel.E), north velocity within a cell (Vel.N), vertical velocity within a cell (Vel.up), error velocity within a cell (Vel.error), blanking distance or depth where measurements first begin (StartDepth), cell height, cell number within an ensemble (cell one is closest to the surface; cellNumber), cell depth, UTM x coordinates (UTM_X), UTM y coordinates (UTM_Y), longitude, latitude, altitude of water surface, and distance from starting point. If project = TRUE, orthogonally projected longitude, latitude, and UTM coordinates (Longitude_Proj, Latitude_Proj, UTM_X_Proj, UTM_Y_Proj) are also returned.
@@ -16,7 +17,7 @@
 #' xSec.secondary(mNine, tNames)
 #' @seealso	\link{project.transect}
  
-xSec.secondary <- function(data, transectNames, project = TRUE) {
+xSec.secondary <- function(data, depthReference = "unit", transectNames, project = TRUE) {
   if(missing(transectNames) == TRUE){
     transectNames <- as.list(as.character(seq_along(data)))
   } else {
@@ -35,12 +36,25 @@ xSec.secondary <- function(data, transectNames, project = TRUE) {
     
     transect <- data[[i]]
     meanVel <- data.frame(transect[[6]][10,,1][[1]])
-    if(transect[[1]][7,,1][[1]] == 0){
-      depth <- transect[[7]][1,,1][[1]]
-    } else {
-      depth <- transect[[6]][7,,1][[1]]
-    }
     names(meanVel) <- c("Mean.Vel.1", "Mean.Vel.2")
+    #pull out depth data measured with the vertical beam, bottom track mode, or both, based on user defined depthReference
+    if(depthReference == "unit"){
+      if(transect[[1]][7,,1][[1]] == 0){
+        depth <- transect[[7]][1,,1][[1]]
+      } else if(transect[[1]][7,,1][[1]] == 1){
+        depth <- transect[[7]][2,,1][[1]]
+      } else {
+        depth <- transect[[6]][7,,1][[1]]
+      }
+    } else if(depthReference == "VB"){
+      depth <- transect[[7]][1,,1][[1]]
+    } else if(depthReference == "BT"){
+      depth <- transect[[7]][2,,1][[1]]
+    } else if(depthReference == "composite"){
+      depth <- transect[[6]][7,,1][[1]]
+    } else {
+      stop("depthReference must either be defined as unit, VB, BT, or composite")
+    }
     
     Vel.E <- transect[[9]][1,,1][[1]][,1,]
     Vel.N <- transect[[9]][1,,1][[1]][,2,]
