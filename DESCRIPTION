@@ -21,6 +21,4 @@ LazyData: TRUE
 License: GPL
 URL: https://github.com/jasonfischer/rivSurveyR
 VignetteBuilder: knitr
-Suggests:
-    knitr
 Disclaimer: Although this program has been used by the USGS, no warranty, expressed or implied, is made by the USGS or the United States Government as to the accuracy and functioning of the program and related program material nor shall the fact of distribution constitute any such warranty, and no responsibility is assumed by the USGS in connection therewith.
