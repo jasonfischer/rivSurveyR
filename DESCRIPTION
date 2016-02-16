@@ -15,6 +15,7 @@ Depends:
     gstat,
     sp,
     R (>= 3.2.2)
+Suggests: knitr
 Description: The rivSurveyR package accepts acoustic Doppler current profiler (ADCP) data exported from SonTek's RiverSurveyor Live program as MATLAB files and allows quick summarization and plotting of water velocities.  It is capable of projecting replicate transects to a mean transect line and averaging measured values that overlap in geographic space.  Planform and secondary velocities from multiple ADCP transects can be processed at once and multiple rotation methods can be used to determine secondary velocities.  Planform flow data can be plotted in geographic space and cross-section plots of secondary velocities can easily be constructed.
 LazyData: TRUE
 License: GPL
