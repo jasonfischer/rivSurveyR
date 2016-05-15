@@ -33,15 +33,21 @@ xSec.planform <- function(data, transectNames, depthReference = "unit", layerRef
   #create list to populate data from each transect with
   ADCP.1 <- list()
   
-  #Check that coordinate system of each transect is ENU
   for (i in seq_along(data)){
+    #RiverSurveyor version 3.9.50 includes site info. in the MATLAB export, to make exports from this version compatiable with older versions, remove the site info.
+    if("SiteInfo" %in% names(data[[i]])){
+      data[[i]] <- data[[i]][-2]
+    } else {
+    }
+    #Check that coordinate system of each transect is ENU
     if(!data[[i]][[1]][4,,1][[1]]==2){
       stop("Coordinate System of transect ", i, " in data list is not ENU. Coordinate system can be changed to ENU in RiverSurveyor Live.")
     } else {      
     }
     
     #depth, velocity, cell info, and GPS data are iteratively extracted from original lists from MATLAB files and appended to ADCP.1
-    transect <- data[[i]]    
+    transect <- data[[i]]
+
     meanVel <- data.frame(transect[[6]][10,,1][[1]])
     names(meanVel) <- c("Mean.Vel.E", "Mean.Vel.N")
     #pull out depth data measured with the vertical beam, bottom track mode, or both, based on user defined depthReference
@@ -62,7 +68,7 @@ xSec.planform <- function(data, transectNames, depthReference = "unit", layerRef
     } else {
       stop("depthReference must either defined as unit, VB, BT, or composite")
     }
-    gps <- data.frame(transect[[8]][1:2,,1][1:2], transect[[8]][7,,1][1],transect[[8]][11,,1][1])
+    gps <- data.frame(transect[[8]][1:2,,1][1:2], transect[[8]][7,,1][1],transect[[8]][,,1]$UTM) #transect[[8]][,,1]$UTM is used, because UTM was pushed back a position in riversurveyor 3.9.50, this allows UTM to be called no matter what the position
     names(gps)[4:5] <- c("UTM_X", "UTM_Y")
     suppressWarnings(gps[which(transect[[8]][[4]] == 0),] <- NA) #if the GPS has acquired zero satellites, convert coordinates to NA, warnings are suppressed, because datasets with complete satellite coverage will trigger a warning about no non-missing arguments
     satellites <- transect[[8]][[4]]

@@ -1,13 +1,13 @@
 ---
 title: "Introduction to rivSurveyR"
 author: "Jason L. Fischer"
-date: 2016-1-6
+date: 2016-5-15
 output:
   rmarkdown::html_vignette:
     toc: yes
 vignette: >
   %\VignetteIndexEntry{Introduction to rivSurveyR}
-  %\VignetteEngine{knitr::knitr}
+  %\VignetteEngine{knitr::rmarkdown}
   \usepackage[utf8]{inputenc}
 ---
 

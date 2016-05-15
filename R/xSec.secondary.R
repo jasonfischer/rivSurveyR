@@ -27,8 +27,13 @@ xSec.secondary <- function(data, depthReference = "unit", transectNames, project
   #Create empty list to populate with velocity and coordinate data  
   secondaryFlow.1 <- list()
   #iteratively populate list with data.tables of data from each transect replicate
-  #Check that coordinate system of each transect is ENU
   for (i in seq_along(data)){
+    #RiverSurveyor version 3.9.50 includes site info. in the MATLAB export, to make exports from this version compatiable with older versions, remove the site info.
+    if("SiteInfo" %in% names(data[[i]])){
+      data[[i]] <- data[[i]][-2]
+    } else {
+    }
+    #Check that coordinate system of each transect is ENU
     if(!data[[i]][[1]][4,,1][[1]]==2){
       stop("Coordinate System of transect ", i, " in data list is not ENU. Coordinate system can be changed to ENU in RiverSurveyor Live.")
     } else {      
@@ -81,7 +86,7 @@ xSec.secondary <- function(data, depthReference = "unit", transectNames, project
     cellNumber <- as.vector(cellNumber)
     cellDepth <- as.vector(cellDepth)
     
-    gps <- data.frame(transect[[8]][1:2,,1],transect[[8]][7,,1],transect[[8]][11,,1])
+    gps <- data.frame(transect[[8]][1:2,,1],transect[[8]][7,,1],transect[[8]][,,1]$UTM) #transect[[8]][,,1]$UTM is used, because UTM was pushed back a position in riversurveyor 3.9.50, this allows UTM to be called no matter what the position
     suppressWarnings(gps[which(transect[[8]][[4]] == 0),] <- NA) #if the GPS has acquired zero satellites, convert coordinates to NA
     names(gps)[4:5] <- c("UTM_X", "UTM_Y")
     
