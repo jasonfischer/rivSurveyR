@@ -3,7 +3,7 @@ title: "Introduction to rivSurveyR"
 author: "Jason L. Fischer"
 date: 2016-5-15
 output:
-  rmarkdown::html_vignette:
+  rmarkdown::pdf_document:
     toc: yes
 vignette: >
   %\VignetteIndexEntry{Introduction to rivSurveyR}
@@ -531,7 +531,7 @@ plot(1:100, pch=19, col=black.white(100))
 
 ## Package Info
 
-U.S. Geological Survey (USGS) Computer Program rivSurveyR version 2015-03. Written by Jason L. Fischer, USGS - Great Lakes Science Center, Ann Arbor, Michigan, USA. Written in programming language R (R Core Team, 2014, www.R-project.org), version 3.0.2 (2015-03-03). Run on a PC with Intel(R) Core(TM) i5 CPU, 2.40 GHz processor, 8.0 GB RAM, and Microsoft Windows 7 Enterprise operating system 2009 Service Pack 1. Source code is available from Jason L. Fischer on GitHub, jfischer@usgs.gov.
+U.S. Geological Survey (USGS) Computer Program rivSurveyR version 2.0. Written by Jason L. Fischer, USGS - Great Lakes Science Center, Ann Arbor, Michigan, USA. Written in programming language R (R Core Team, 2014, www.R-project.org), version 3.2.4 (2016-03-16). Run on a PC with Intel(R) Core(TM) i5 CPU, 2.40 GHz processor, 8.0 GB RAM, and Microsoft Windows 7 Enterprise operating system 2009 Service Pack 1. Source code is available from Jason L. Fischer on GitHub, jfischer@usgs.gov.
 
 ## Disclaimer
 
