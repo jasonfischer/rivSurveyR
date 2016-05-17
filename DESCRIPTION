@@ -1,6 +1,6 @@
 Package: rivSurveyR
-Version: 2.0-0
-Date: 2016-5-15
+Version: 2.1-0
+Date: 2016-5-16
 Title: A Package to Process Water Velocities Collected With SonTek Acoustic
     Doppler Current Profilers
 Authors@R: person(given="Jason L.", family="Fischer", email="fisch133@gmail.com", role=c("aut", "cre"))
@@ -15,7 +15,7 @@ Depends:
     latticeExtra,
     gstat,
     sp,
-    R (>= 3.2.2)
+    R (>= 3.3.0)
 Suggests:
     knitr
 Description: The rivSurveyR package accepts acoustic Doppler current profiler

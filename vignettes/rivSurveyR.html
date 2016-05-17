@@ -51,7 +51,7 @@ code > span.er { color: #ff0000; font-weight: bold; }
 
 <h1 class="title toc-ignore">Introduction to rivSurveyR</h1>
 <h4 class="author"><em>Jason L. Fischer</em></h4>
-<h4 class="date"><em>2016-5-15</em></h4>
+<h4 class="date"><em>2016-5-16</em></h4>
 
 
 <div id="TOC">
@@ -107,11 +107,6 @@ code > span.er { color: #ff0000; font-weight: bold; }
 <h3>Compiling SonTek ADCP planform data</h3>
 <p>To get started load the <code>rivSurveyR</code> package and import ADCP files into R.</p>
 <pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(rivSurveyR)</code></pre>
-<pre><code>## Warning: package 'R.matlab' was built under R version 3.2.5</code></pre>
-<pre><code>## Warning: package 'R.utils' was built under R version 3.2.5</code></pre>
-<pre><code>## Warning: package 'latticeExtra' was built under R version 3.2.5</code></pre>
-<pre><code>## Warning: package 'gstat' was built under R version 3.2.5</code></pre>
-<pre><code>## Warning: package 'sp' was built under R version 3.2.5</code></pre>
 <p><code>rivSurveyR</code> only accepts MATLAB files (.mat) which have been exported from RiverSurveyor Live (see RiverSurveyor Live help for details on converting RiverSurveyor Live files to MATLAB files). Additionally, all files must use an ENU (east, north, up) coordinate system, the coordinate system can be set in RiverSurveyor Live prior to exporting data as a MATLAB file. Once RiverSurveyor files have been converted to MATLAB format, they can be imported using <code>readMat</code> in the <code>R.matlab</code> package, which is included as part of <code>rivSurveyR</code>. Example MATLAB files are not provided, but the code below could be used to import the files corresponding to the replicated measurements of a transect.</p>
 <pre class="sourceCode r"><code class="sourceCode r">transect1a &lt;-<span class="st"> </span><span class="kw">readMat</span>(<span class="st">&quot;transect1a.mat&quot;</span>)
 transect1b &lt;-<span class="st"> </span><span class="kw">readMat</span>(<span class="st">&quot;transect1b.mat&quot;</span>)</code></pre>
@@ -581,7 +576,7 @@ ensembleOne &lt;-<span class="st"> </span>ensembleOne[<span class="kw">order</sp
 </div>
 <div id="package-info" class="section level2">
 <h2>Package Info</h2>
-<p>U.S. Geological Survey (USGS) Computer Program rivSurveyR version 2015-03. Written by Jason L. Fischer, USGS - Great Lakes Science Center, Ann Arbor, Michigan, USA. Written in programming language R (R Core Team, 2014, www.R-project.org), version 3.0.2 (2015-03-03). Run on a PC with Intel(R) Core(TM) i5 CPU, 2.40 GHz processor, 8.0 GB RAM, and Microsoft Windows 7 Enterprise operating system 2009 Service Pack 1. Source code is available from Jason L. Fischer on GitHub, <a href="mailto:jfischer@usgs.gov">jfischer@usgs.gov</a>.</p>
+<p>U.S. Geological Survey (USGS) Computer Program rivSurveyR version 2.1. Written by Jason L. Fischer, USGS - Great Lakes Science Center, Ann Arbor, Michigan, USA. Written in programming language R (R Core Team, 2014, www.R-project.org), version 3.3.0 (2016-05-03). Run on a PC with Intel(R) Core(TM) i5 CPU, 2.40 GHz processor, 8.0 GB RAM, and Microsoft Windows 7 Enterprise operating system 2009 Service Pack 1. Source code is available from Jason L. Fischer on GitHub, <a href="mailto:jfischer@usgs.gov">jfischer@usgs.gov</a>.</p>
 </div>
 <div id="disclaimer" class="section level2">
 <h2>Disclaimer</h2>

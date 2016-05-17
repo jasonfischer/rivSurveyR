@@ -79,11 +79,11 @@ Although this program has been used by the USGS, no warranty, expressed or impli
 
 \section{Additional Information}{
 
-U.S. Geological Survey (USGS) Computer Program \pkg{rivSurveyR} version 0.1-0
+U.S. Geological Survey (USGS) Computer Program \pkg{rivSurveyR} version 2.1-0
 
 Written by Jason L. Fischer, USGS - Great Lakes Science Center; \href{http://www.glsc.usgs.gov/}{glsc.usgs.gov}; Ann Arbor, Michigan, USA.
 
-Written in programming language R (R Core Team, 2015, \href{http://www.R-project.org}{R-project.org}), version 3.2.2 (2015-08-14).
+Written in programming language R (R Core Team, 2015, \href{http://www.R-project.org}{R-project.org}), version 3.3.0 (2016-05-03).
 
 Run on a PC with Intel(R) Core(TM) i5 CPU, M 520 at 2.40 GHz processor, 8.0 GB RAM, and Microsoft Windows 7 Enterprise operating system 2009 Service Pack 1.
 
