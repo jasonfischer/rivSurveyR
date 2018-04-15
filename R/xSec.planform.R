@@ -79,7 +79,7 @@ xSec.planform <- function(data, transectNames, depthReference = "unit", layerRef
     cellHeight <- transect[[5]][8,,1][[1]]
     startDepth <- transect[[5]][7,,1][[1]]
     temperature <- transect[[5]][[2]]
-    firstMeasCell <- apply(vel, 3, FUN = function(x) { #added 3Apr2018
+    firstMeasCell <- apply(vel, 3, FUN = function(x) { 
       rNames <- seq_along(x[,1])
       x <- na.omit(data.frame(x, rNames))
       if (nrow(x) == 0) {
