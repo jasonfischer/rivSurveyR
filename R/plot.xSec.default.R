@@ -106,10 +106,11 @@ plot.xSec.default <- function(data, x, transect, cellWidth, cellHeight, arrows =
   }
   
   #create an object with depths and distances along transect, which will be used to interpolate x to a grid
-  coorADCP <- cbind(tDist = dt$tDist, cellDepth = dt$cellDepth)
+  dtInterp <- dt[!is.na(tDist) & !is.na(cellDepth),,]
+  coorADCP <- cbind(tDist = dtInterp$tDist, cellDepth = dtInterp$cellDepth)
   
   #create a spatial points data.frame
-  spADCP <- SpatialPointsDataFrame(coorADCP, dt) 
+  spADCP <- SpatialPointsDataFrame(coorADCP, dtInterp) 
   spoints <- SpatialPoints(coorADCP + (c(cellWidth, cellHeight)/2))
   
   #set grid for interpolation that is within the measured area (includes cells, below max depths)
@@ -126,8 +127,10 @@ plot.xSec.default <- function(data, x, transect, cellWidth, cellHeight, arrows =
   
   #create polygon outlining sampled area, this will be used to remove interpolated data that falls outside the measured area
   shallow <- dt[,min(cellDepth, na.rm = TRUE), by = tDist]
-  dep <- dt[,max(cellDepth, na.rm = TRUE)- mean(cellHeight, na.rm = TRUE), by = tDist]
+  dep <- rbind(dt[,mean(depth, na.rm = TRUE), by = tDist], dt[,mean(bottomCellDepth + mean(cellHeight, na.rm = TRUE)/2, na.rm = TRUE), by = tDist])
+  dep <- dep[,min(V1), by=tDist] #keep whichever is less, vb depth or bottom cell depth
   bound <- rbind(dep[order(tDist)], shallow[order(tDist, decreasing = TRUE)])
+  bound <- na.omit(bound)
   bound <- rbind(bound, bound[1,])
   bound <- Polygon(bound)
   bound <- Polygons(list(bound), 1)
@@ -173,78 +176,81 @@ plot.xSec.default <- function(data, x, transect, cellWidth, cellHeight, arrows =
   
   #if arrows is true and a primary velocity parameter is defined for x, create an object used to call the appropriate secondary velocity parameter
   if(arrows == TRUE){
-    stopifnot(x %in% c("vp.roz", "vpx.roz", "vsx.roz", "vp.zsq", "vx") & arrows==TRUE)
-    if(x == "vp.roz"){
-      vs <- "vs.roz"
-    } else if(x == "vpx.roz"){
-      vs <- "vpy.roz"
-    } else if(x == "vsx.roz"){
-      vs <- "vsy.roz"
-    } else if(x == "vp.zsq"){
-      vs <- "vs.zsq"
-    } else {
-      vs <- "vy"
-    }
-    vs <- eval(quote(vs))
-    
-    #determine location for the arrow key
-    if("arrow.key" %in% (names(match.call(expand.dots=F))) == FALSE){
-      arrow.key <- c(min(xlim), max(ylim))
-      key.x <- min(xlim)+(diff(xlim)*0.025)
-      key.y <- c((max(ylim)+(diff(ylim)*0.10*key.cex)), (max(ylim)+(diff(ylim)*0.06*key.cex)), max(ylim)+(diff(ylim)*0.02*key.cex))
-    } else if(is.numeric(arrow.key) == TRUE){
-      key.x <- arrow.key[1]+diff(xlim)*0.05
-      key.y <- c((arrow.key[2] + (diff(ylim)*0.10*key.cex)), (arrow.key[2]+(diff(ylim)*0.06*key.cex)), arrow.key[2]+(diff(ylim)*0.02*key.cex))
-    } else {
-    }
-    
-    #determine the values to be displayed in the arrow key
-    if(scale.by == "individual"){
-      keyValues <- summary(dt[,abs(na.omit(get(vs)))]) #This scales arrow size to individual transects
-    } else {
-      keyValues <- summary(data[,abs(na.omit(get(vs)))]) #This scales arrow size to all transects of interest similarly
-    } 
-    keyValues <- keyValues[which(!names(keyValues) == "Mean")]
-    keyValues <- c(keyValues["Min."][[1]], keyValues["Median"][[1]], keyValues["Max."][[1]])
-    keyValues <- round(as.numeric(keyValues), digits = 2)
-    keyValues <- as.factor(keyValues)
-    keyValues <- c(min(as.numeric(as.character(keyValues))), median(as.numeric(as.character(keyValues))), max(as.numeric(as.character(keyValues))))
-    
-    #set a grid and interpolate the horizontal and vertical secondary velocities
-    spADCP <- SpatialPointsDataFrame(coorADCP, dt) 
-    bb <- bbox(spADCP)
-    cs <- c(arrow.x.spacing, arrow.y.spacing)
-    cc <- bb[,1] + (cs/2)
-    cd <- ceiling(diff(t(bb))/cs)
-    gridADCP <- GridTopology(cellcentre.offset = cc, cellsize = cs, cells.dim = cd)
-    p4s <- CRS(proj4string(spADCP))
-    sgADCP <- SpatialGrid(gridADCP, proj4string =p4s)
-    
-    x.arrow <- krige(get(vs) ~ 1, spADCP[!is.na(spADCP@data[,vs]),], sgADCP)    
-    x.arrow <- x.arrow[!is.na(over(x.arrow, bound)),]    
-    x.arrow <- data.frame(x.arrow) 
-    x.arrow <- data.table(x.arrow[,(-2)])
-    keycols <- c("tDist", "cellDepth")
-    setkeyv(x.arrow, keycols)
-    
-    y.arrow <- krige(Vel.up ~ 1, spADCP[!is.na(spADCP$Vel.up),], sgADCP)
-    y.arrow <- y.arrow[!is.na(over(y.arrow, bound)),]    
-    y.arrow <- data.frame(y.arrow)
-    y.arrow <- data.table(y.arrow[,(-2)])
-    setkeyv(y.arrow, keycols)
-    
-    #merge the horizontal and vertical secondary velocities into one data.table
-    flow.arrows <- (merge(x.arrow, y.arrow))
-    setnames(flow.arrows, names(flow.arrows)[3:4], c("vs", "vu"))
-    
-    #scale arrow x and y vectors to the x and y range of the figure
-    flow.arrows$scaleFactor <- diff(range(dt$tDist, na.rm = TRUE))/diff(range(dt$cellDepth, na.rm = TRUE))
-    flow.arrows$arrow_scale <- arrow_scale
-    if(is.numeric(arrow.key) == TRUE){
-      key.scale <- data.frame(key.x, key.y, keyValues, scaleFactor = flow.arrows$scaleFactor[1], arrow_scale, keyCol, xlim = diff(xlim), ylim = diff(ylim))
-    }else{
+    if(x %in% c("vp.roz", "vpx.roz", "vsx.roz", "vp.zsq", "vx")){
+      if(x == "vp.roz"){
+        vs <- "vs.roz"
+      } else if(x == "vpx.roz"){
+        vs <- "vpy.roz"
+      } else if(x == "vsx.roz"){
+        vs <- "vsy.roz"
+      } else if(x == "vp.zsq"){
+        vs <- "vs.zsq"
+      } else {
+        vs <- "vy"
+      }
+      vs <- eval(quote(vs))
       
-    }
+      #determine location for the arrow key
+      if("arrow.key" %in% (names(match.call(expand.dots=F))) == FALSE){
+        arrow.key <- c(min(xlim), max(ylim))
+        key.x <- min(xlim)+(diff(xlim)*0.025)
+        key.y <- c((max(ylim)+(diff(ylim)*0.14*key.cex)), (max(ylim)+(diff(ylim)*0.08*key.cex)), max(ylim)+(diff(ylim)*0.02*key.cex))
+      } else if(is.numeric(arrow.key) == TRUE){
+        key.x <- arrow.key[1]+diff(xlim)*0.05
+        key.y <- c((arrow.key[2] + (diff(ylim)*0.14*key.cex)), (arrow.key[2]+(diff(ylim)*0.08*key.cex)), arrow.key[2]+(diff(ylim)*0.02*key.cex))
+      } else {
+      }
+      
+      #determine the values to be displayed in the arrow key
+      if(scale.by == "individual"){
+        keyValues <- summary(dt[,abs(na.omit(get(vs)))]) #This scales arrow size to individual transects
+      } else {
+        keyValues <- summary(data[,abs(na.omit(get(vs)))]) #This scales arrow size to all transects of interest similarly
+      } 
+      keyValues <- keyValues[which(!names(keyValues) == "Mean")]
+      keyValues <- c(keyValues["Min."][[1]], keyValues["Median"][[1]], keyValues["Max."][[1]])
+      keyValues <- round(as.numeric(keyValues), digits = 2)
+      keyValues <- as.factor(keyValues)
+      keyValues <- c(min(as.numeric(as.character(keyValues))), median(as.numeric(as.character(keyValues))), max(as.numeric(as.character(keyValues))))
+      
+      #set a grid and interpolate the horizontal and vertical secondary velocities
+      spADCP <- SpatialPointsDataFrame(coorADCP, dtInterp) 
+      bb <- bbox(spADCP)
+      cs <- c(arrow.x.spacing, arrow.y.spacing)
+      cc <- bb[,1] + (cs/2)
+      cd <- ceiling(diff(t(bb))/cs)
+      gridADCP <- GridTopology(cellcentre.offset = cc, cellsize = cs, cells.dim = cd)
+      p4s <- CRS(proj4string(spADCP))
+      sgADCP <- SpatialGrid(gridADCP, proj4string = p4s)
+      
+      x.arrow <- krige(get(vs) ~ 1, spADCP[!is.na(spADCP@data[,vs]),], sgADCP)    
+      x.arrow <- x.arrow[!is.na(over(x.arrow, bound)),]    
+      x.arrow <- data.frame(x.arrow) 
+      x.arrow <- data.table(x.arrow[,(-2)])
+      keycols <- c("tDist", "cellDepth")
+      setkeyv(x.arrow, keycols)
+      
+      y.arrow <- krige(Vel.up ~ 1, spADCP[!is.na(spADCP$Vel.up),], sgADCP)
+      y.arrow <- y.arrow[!is.na(over(y.arrow, bound)),]    
+      y.arrow <- data.frame(y.arrow)
+      y.arrow <- data.table(y.arrow[,(-2)])
+      setkeyv(y.arrow, keycols)
+      
+      #merge the horizontal and vertical secondary velocities into one data.table
+      flow.arrows <- (merge(x.arrow, y.arrow))
+      setnames(flow.arrows, names(flow.arrows)[3:4], c("vs", "vu"))
+      
+      #scale arrow x and y vectors to the x and y range of the figure
+      flow.arrows$scaleFactor <- diff(range(dt$tDist, na.rm = TRUE))/diff(range(dt$cellDepth, na.rm = TRUE))
+      flow.arrows$arrow_scale <- arrow_scale
+      if(is.numeric(arrow.key) == TRUE){
+        key.scale <- data.frame(key.x, key.y, keyValues, scaleFactor = flow.arrows$scaleFactor[1], arrow_scale, keyCol, xlim = diff(xlim), ylim = diff(ylim))
+      }else{
+        
+      }
+    } else {
+      warning("x must be vp.roz, vpx.roz, vsx.roz, vp.zsq, or vx to plot directional arrows")
+    }   
   } else {
   }
   #define the color scale used to display x

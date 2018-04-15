@@ -21,11 +21,12 @@ transectHeading <- function(x, y, velE, velN, depth, flowHeading){
 
   #determine the direction (x or y) of the greatest dispersion and then determine the transect heading based on the distance traveled in the x and y directions
   if (diff(range(xy$x)) >= diff(range(xy$y))){
-    xy <- xy[order(x),,]
+    project <- lm(y~x, xy)
+    tHeading <- 90 - (atan(coef(project)[[2]]) * 180/pi)
   }else{
-    xy <- xy[order(y),,]
+    project <- lm(x~y, xy)
+    tHeading <- 90 - ((atan(1/coef(project)[[2]])) * 180/pi)
   }
-  tHeading <- heading(xy$x[nrow(xy)]-xy$x[1], xy$y[nrow(xy)]-xy$y[1])
 
   if (missing(flowHeading) == TRUE){
     flowHeading <- heading(mean(velE * depth, na.rm = TRUE), mean(velN * depth, na.rm = TRUE))

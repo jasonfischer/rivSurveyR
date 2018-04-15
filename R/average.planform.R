@@ -4,7 +4,7 @@
 #' @param data	Either a list of MATLAB files exported from RiverSurveyor to be compiled or an object of class "adcp.planform".
 #' @param transectNames	A list of transect names corresponding to the transects represented by the MATLAB files. See 'details' for additional information.
 #' @param FUN	Function used to summarize ADCP data, default is \link{mean}
-#' @param binWidth	Width used to bin data along a transect, for summarization. Default is the mean distance between samples.
+#' @param binWidth	Width used to bin data along a transect, for summarization. Default is the 95 percentile of distances between samples.
 #' @param depthReference	Defines the depth measurements to be used. The default ("unit") uses the method defined in RiverSurveyor, but \code{depthReference} can be set to use measurements from the vertical beam ("VB"), bottom-track beams ("BT"), or both ("composite").
 #' @param layerReference	Defines layerAvg bounds x1 and x2 as a distance from surface ("surface", default), distance above bottom ("bottom"), or percent of total depth ("percent").
 #' @param x1	Lower bound velocities are averaged over. Either a numeric representing a depth or percentage or a character where "minimum" equals the minimum distance from the reference point (i.e., 0 when \code{layerReference} = "surface" and bottomCellDepth when \code{layerReference} = "bottom") and "maximum" equals maximum distance from the reference point. Must be numeric if \code{layerReference} = "percent". Defaults to "minimum".
@@ -60,7 +60,7 @@ average.planform <- function(data, transectNames, FUN = mean, binWidth, depthRef
     }
     
     if(missing(binWidth)==TRUE){
-      binWidth <- round(mean(diff(ADCP[[i]]$distance), na.rm = TRUE), digits = 1)
+      binWidth <- round(quantile(diff(ADCP[[i]]$distance), 0.95, na.rm = TRUE), digits = 1)
     } else {
     }
     ADCP[[i]] <- ADCP[[i]][,!c("distance"), with = FALSE]

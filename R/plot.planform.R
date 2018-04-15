@@ -133,10 +133,10 @@ plot.planform <- function(data, x, interpolate, coord = "projected.utm",
     if("arrow.key" %in% (names(match.call(expand.dots=T))) == FALSE){
       arrow.key <- c(min(xlim), min(ylim))
       key.x <- min(xlim)+(diff(xlim)*0.03)
-      key.y <- c((min(ylim)+(diff(ylim)*0.10*key.cex)), (min(ylim)+(diff(ylim)*0.06*key.cex)), min(ylim)+(diff(ylim)*0.02*key.cex))
+      key.y <- c((min(ylim)+(diff(ylim)*0.14*key.cex)), (min(ylim)+(diff(ylim)*0.08*key.cex)), min(ylim)+(diff(ylim)*0.02*key.cex))
     } else if(is.numeric(arrow.key) == TRUE){
       key.x <- arrow.key[1]+diff(xlim)*0.05
-      key.y <- c((arrow.key[2] + (diff(ylim)*0.10*key.cex)), (arrow.key[2]+(diff(ylim)*0.06*key.cex)), arrow.key[2]+(diff(ylim)*0.02*key.cex))
+      key.y <- c((arrow.key[2] + (diff(ylim)*0.14*key.cex)), (arrow.key[2]+(diff(ylim)*0.08*key.cex)), arrow.key[2]+(diff(ylim)*0.02*key.cex))
     } else {
     }
     

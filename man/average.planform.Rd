@@ -15,7 +15,7 @@ average.planform(data, transectNames, FUN = mean, binWidth,
 
 \item{FUN}{Function used to summarize ADCP data, default is \link{mean}}
 
-\item{binWidth}{Width used to bin data along a transect, for summarization. Default is the mean distance between samples.}
+\item{binWidth}{Width used to bin data along a transect, for summarization. Default is the 95 percentile of distances between samples.}
 
 \item{depthReference}{Defines the depth measurements to be used. The default ("unit") uses the method defined in RiverSurveyor, but \code{depthReference} can be set to use measurements from the vertical beam ("VB"), bottom-track beams ("BT"), or both ("composite").}
 

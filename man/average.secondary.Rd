@@ -16,9 +16,9 @@ average.secondary(data, transectNames, depthReference = "unit",
 
 \item{project}{Logical.  If TRUE (default), transect replicates are projected to a mean transect line using an orthogonal projection of the x and y coordinates. If FALSE transects are not projected to a mean transect line.}
 
-\item{binWidth}{Width used to bin data along a transect, for summarization. Default is the mean distance between samples.}
+\item{binWidth}{Width used to bin data along a transect, for summarization. Default is the 95 percentile of distances between samples.}
 
-\item{binHeight}{Depth interval used to bin data within an ensemble, for summarization. If missing, cell depth is used group cells for summarization.}
+\item{binHeight}{Depth interval used to bin data within an ensemble, for summarization. If missing, 95 percentile of cell depths is used group cells for summarization.}
 
 \item{FUN}{Function used to summarize ADCP data, default is \link{mean}}
 }

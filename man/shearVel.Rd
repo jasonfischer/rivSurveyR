@@ -4,7 +4,7 @@
 \alias{shearVel}
 \title{shearVel}
 \usage{
-shearVel(ve, vn, vu = 0, depth, h, Dc, n, p = 1000,
+shearVel(ve, vn, vu = 0, depth, bcDepth, Dc, n, p = 1000,
   reference = "bottomCell", units = "metric")
 }
 \arguments{
@@ -16,7 +16,7 @@ shearVel(ve, vn, vu = 0, depth, h, Dc, n, p = 1000,
 
 \item{depth}{A vector of depths, the same length as \code{ve}.}
 
-\item{h}{A vector containing the depth of the bottom cell, only needed if reference is bottomCell. Must be the same length as \code{ve}.}
+\item{bcDepth}{A vector containing the depth of the bottom cell, only needed if reference is bottomCell. Must be the same length as \code{ve}.}
 
 \item{Dc}{Sediment diameter of 90th percentile}
 

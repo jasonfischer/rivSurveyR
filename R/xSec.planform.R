@@ -8,8 +8,8 @@
 #' @param x1	Lower bound velocities are averaged over. Either a numeric representing a depth or percentage or a character where "minimum" equals the minimum distance from the reference point (i.e., 0 when \code{layerReference} = "surface" and bottomCellDepth when \code{layerReference} = "bottom") and "maximum" equals maximum distance from the reference point. Must be numeric if \code{layerReference} = "percent". Defaults to "minimum".
 #' @param x2	Upper bound velocities are averaged over. Either a numeric representing a depth or percentage or a character where "minimum" equals the minimum distance from the reference point (i.e., 0 when \code{layerReference} = "surface" and bottomCellDepth when \code{layerReference} = "bottom") and "maximum" equals maximum distance from the reference point. Must be numeric if \code{layerReference} = "percent". Defaults to "maximum".
 #' @param project	Logical.  If TRUE (default), transect replicates are projected to a mean transect line using an orthogonal projection of the x and y coordinates. If FALSE transects are not projected to a mean transect line.
-#' @details	When assigning transectNames, order matters, the transect names must be in the same order of the MATLAB files assigned to the data argument. Ex., if the first two files in the list are Transect1a and Transect1b, which are replicates of Transect1, t first two files in the name list are "Transect1" and "Transect1".  The processing functions will spatially average and compile all data from the same transects, this tells the processing functions to average and compile these two files. Listing the names as "Transect1a" and "Transect1b" results in the transects being processed separately.  \code{transectNames} will only expect characters and names must be enclosed in "".
-#' @return	A \link[data.table]{data.table} with the transect name (transectName), UTM x coordinates (UTM_X), UTM y coordinates (UTM_Y), depth, depth averaged velocity to the east (Mean.Vel.E), depth averaged velocity to the north (Mean.Vel.N), depth of the bottom most cell in an ensemble (bottomCellDepth), distance of the bottom cell to the bottom (distToBottom), bottom cell velocity to the east (BC.Vel.E), bottom cell velocity to the north (BC.Vel.N), bottom cell vertical velocity (BC.Vel.Up), bottom cell error velocity (BC.Vel.Error), layer averaged velocity to the east (layerVel.E), layer averaged velocity to the north (layerVel.N), layer averaged vertical velocity (layerVel.Up), longitude, latitude, altitude of water surface, distance from starting point, and temperature. If project = TRUE, orthogonally projected longitude, latitude, and UTM coordinates (Longitude_Proj, Latitude_Proj, UTM_X_Proj, UTM_Y_Proj) are also returned.
+#' @details When assigning transectNames, order matters, the transect names must be in the same order of the MATLAB files assigned to the data argument. Ex., if the first two files in the list are Transect1a and Transect1b, which are replicates of Transect1, t first two files in the name list are "Transect1" and "Transect1".  The processing functions will spatially average and compile all data from the same transects, this tells the processing functions to average and compile these two files. Listing the names as "Transect1a" and "Transect1b" results in the transects being processed separately.  \code{transectNames} will only expect characters and names must be enclosed in "".
+#' @return  A \link[data.table]{data.table} with the transect name (transectName), UTM x coordinates (UTM_X), UTM y coordinates (UTM_Y), depth, depth averaged velocity to the east (Mean.Vel.E), depth averaged velocity to the north (Mean.Vel.N), depth of the bottom most cell in an ensemble (bottomCellDepth), distance of the bottom cell to the bottom (distToBottom), bottom cell velocity to the east (BC.Vel.E), bottom cell velocity to the north (BC.Vel.N), bottom cell vertical velocity (BC.Vel.Up), bottom cell error velocity (BC.Vel.Error), layer averaged velocity to the east (layerVel.E), layer averaged velocity to the north (layerVel.N), layer averaged vertical velocity (layerVel.Up), longitude, latitude, altitude of water surface, distance from starting point, and temperature. If project = TRUE, orthogonally projected longitude, latitude, and UTM coordinates (Longitude_Proj, Latitude_Proj, UTM_X_Proj, UTM_Y_Proj) are also returned.
 #' @export
 #' @examples
 #' data(mNine)
@@ -79,7 +79,18 @@ xSec.planform <- function(data, transectNames, depthReference = "unit", layerRef
     cellHeight <- transect[[5]][8,,1][[1]]
     startDepth <- transect[[5]][7,,1][[1]]
     temperature <- transect[[5]][[2]]
-    bottomCellDepth <- cells * cellHeight + startDepth
+    firstMeasCell <- apply(vel, 3, FUN = function(x) { #added 3Apr2018
+      rNames <- seq_along(x[,1])
+      x <- na.omit(data.frame(x, rNames))
+      if (nrow(x) == 0) {
+        return(NA)
+      } else {
+        return(min(x$rNames))
+      }
+    }
+    )
+    firstMeasCellDep <- (firstMeasCell*cellHeight)+startDepth
+    bottomCellDepth <- cells * cellHeight + firstMeasCellDep
     distToBottom <- depth - bottomCellDepth
     names(distToBottom) <- c("distToBottom")
     #set-up a matrix to hold east, north, up, and difference velocities of the deepest cell measured for each ensemble
@@ -89,7 +100,8 @@ xSec.planform <- function(data, transectNames, depthReference = "unit", layerRef
       if(cells[w,1] == 0){
         bottomCellVel[w,] <- NaN
       } else {
-        bottomCellVel[w,] <- vel[cells[w,1],,w]
+        bottomCell <- cells[w,1]+firstMeasCell[w]-1
+        bottomCellVel[w,] <- vel[bottomCell,,w]
       }
       
     }
@@ -98,13 +110,13 @@ xSec.planform <- function(data, transectNames, depthReference = "unit", layerRef
     stopifnot(layerReference %in% c("percent", "bottom", "surface"))
     #determine the value of x1 and x2 to be passed to layerAvg, based on layerReference and distance from either the surface or bottom
     if(layerReference == "percent"){
-      x1.1 <- depth * x1/100
-      x2.1 <- depth * x2/100
+      x1.1 <- depth * x1/100 
+      x2.1 <- depth * x2/100 
     }else if(layerReference == "bottom"){
       if(x2 == "minimum"){
         x2.1 <- bottomCellDepth
       }else if(x2 == "maximum"){
-        x2.1 <- cellHeight + startDepth
+        x2.1 <- cellHeight + firstMeasCellDep
       }else{
         x2.1 <- depth - x2
       }
@@ -124,7 +136,7 @@ xSec.planform <- function(data, transectNames, depthReference = "unit", layerRef
         x1.1 <- matrix(rep(x1, times = length(depth)))
       }
       if(x2 == "minimum"){
-        x2.1 <- cellHeight + startDepth
+        x2.1 <- cellHeight + firstMeasCellDep
       }else if(x2 == "maximum"){
         x2.1 <- bottomCellDepth
       }else{
@@ -145,9 +157,9 @@ xSec.planform <- function(data, transectNames, depthReference = "unit", layerRef
       if(depth[w,] <= 0 | is.na(depth[w,]) == TRUE) {
         layAvg[w] <- NA
       } else {
-        layerVel.E <- layerAvg(x = cellDepth[,w], y = vel[,1,w], x1 = x1.1[w,], x2 = x2.1[w,])
-        layerVel.N <- layerAvg(x = cellDepth[,w], y = vel[,2,w], x1 = x1.1[w,], x2 = x2.1[w,])
-        layerVel.Up <- layerAvg(x = cellDepth[,w], y = vel[,3,w], x1 = x1.1[w,], x2 = x2.1[w,])
+        layerVel.E <- layerAvg(x = cellDepth[,w], y = vel[,1,w], x1 = x1.1[w,], x2 = x2.1[w,], na.rm=TRUE)
+        layerVel.N <- layerAvg(x = cellDepth[,w], y = vel[,2,w], x1 = x1.1[w,], x2 = x2.1[w,], na.rm=TRUE)
+        layerVel.Up <- layerAvg(x = cellDepth[,w], y = vel[,3,w], x1 = x1.1[w,], x2 = x2.1[w,], na.rm=TRUE)
         
         layAvg[[w]] <- data.frame(layerVel.E, layerVel.N, layerVel.Up)
       }

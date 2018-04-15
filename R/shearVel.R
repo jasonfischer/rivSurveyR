@@ -5,7 +5,7 @@
 #' @param vn	A vector of velocities to the north, should be bottom cell velocity is reference is "bottomCell" and depth averaged velocity if reference is "mean". Must be the same length as \code{ve}.
 #' @param vu	A vector of vertical velocities, default is 0, should be bottom cell velocity is reference is "bottomCell" and depth averaged velocity if reference is "mean". Must be the same length as \code{ve}.
 #' @param depth	A vector of depths, the same length as \code{ve}.
-#' @param h	A vector containing the depth of the bottom cell, only needed if reference is bottomCell. Must be the same length as \code{ve}.
+#' @param bcDepth	A vector containing the depth of the bottom cell, only needed if reference is bottomCell. Must be the same length as \code{ve}.
 #' @param Dc	Sediment diameter of 90th percentile
 #' @param n	Used to calculate local roughness height (Kc) Kc=n*Dc
 #' @param p	Water density (kg/m^3)
@@ -23,7 +23,7 @@
 #' Cheng-Lung 1991. “Unified Theory on Power Laws for Flow Resistance.” Journal of Hydraulic Engineering, Vol. 117, No. 3, March 1991, 371-389. 
 #' Simpson, M.R. and Oltmann, R.N. 1990. “An Acoustic Doppler Discharge Measurement System.” Proceedings of the 1990 National Conference on Hydraulic Engineering, Vol. 2, 903-908.
 
-shearVel <- function(ve, vn, vu = 0, depth, h, Dc, n, p = 1000, reference = "bottomCell", units = "metric") {
+shearVel <- function(ve, vn, vu = 0, depth, bcDepth, Dc, n, p = 1000, reference = "bottomCell", units = "metric") {
   stopifnot(reference %in% c("bottomCell", "mean"), units %in% c("metric", "standard"))
   #convert standard units to metric
   if(units == "standard"){
@@ -31,7 +31,7 @@ shearVel <- function(ve, vn, vu = 0, depth, h, Dc, n, p = 1000, reference = "bot
     vn <- vn * 0.3048
     vu <- vu * 0.3048
     depth <- depth * 0.3048
-    h <- h * 0.3048
+    bcDepth <- bcDepth * 0.3048
     Dc <- Dc * 0.3048
   } else {
     
@@ -48,7 +48,7 @@ shearVel <- function(ve, vn, vu = 0, depth, h, Dc, n, p = 1000, reference = "bot
     TbU <- p * Cf * vu^2
     ustarU <- sqrt(TbU / p) * vn/abs(vu)
   } else if(reference == "bottomCell") {
-    h <- depth - h
+    h <- depth - bcDepth
     ustarE <- ve/(9.5 * (h/kc)^(1/6))
     ustarN <- vn/(9.5 * (h/kc)^(1/6))
     ustarU <- vu/(9.5 * (h/kc)^(1/6))

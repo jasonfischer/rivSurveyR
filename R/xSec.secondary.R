@@ -86,6 +86,20 @@ xSec.secondary <- function(data, depthReference = "unit", transectNames, project
     cellNumber <- as.vector(cellNumber)
     cellDepth <- as.vector(cellDepth)
     
+    cells <- t(transect[[6]][8,,1][[1]])
+    firstMeasCell <- apply(Vel.E, 2, FUN = function(x) {
+      rNames <- seq_along(x)
+      x <- na.omit(data.frame(x, rNames))
+      if (nrow(x) == 0) {
+        return(NA)
+      } else {
+        return(min(x$rNames))
+      }
+    }
+    )
+    firstMeasCellDep <- (firstMeasCell*cellHeight)+startDepth
+    bottomCellDepth <- cells * cellHeight + firstMeasCellDep
+    
     gps <- data.frame(transect[[8]][1:2,,1],transect[[8]][7,,1],transect[[8]][,,1]$UTM) #transect[[8]][,,1]$UTM is used, because UTM was pushed back a position in riversurveyor 3.9.50, this allows UTM to be called no matter what the position
     suppressWarnings(gps[which(transect[[8]][[4]] == 0),] <- NA) #if the GPS has acquired zero satellites, convert coordinates to NA
     names(gps)[4:5] <- c("UTM_X", "UTM_Y")
@@ -101,6 +115,7 @@ xSec.secondary <- function(data, depthReference = "unit", transectNames, project
     Altitude <- rep(gps$Altitude, each=nrow(Vel.E))
     startDepth <- rep(startDepth, each=nrow(Vel.E))
     cellHeight <- rep(cellHeight, each=nrow(Vel.E))  
+    bottomCellDepth <- rep(bottomCellDepth, each=nrow(Vel.E))  
     distance <- rep(distance, each=nrow(Vel.E))
     sampleNum <- rep(sampleNum, each=nrow(Vel.E))
     
@@ -109,14 +124,16 @@ xSec.secondary <- function(data, depthReference = "unit", transectNames, project
     Vel.up <- as.vector(Vel.up)
     Vel.error <- as.vector(Vel.error)
     
-    secondaryFlow.1[[i]] <- data.table(Mean.Vel.E, Mean.Vel.N, depth, Vel.E, Vel.N, Vel.up, Vel.error, startDepth, cellHeight, cellNumber, cellDepth, UTM_X, UTM_Y, Longitude, Latitude, Altitude, distance, sampleNum)
+    secondaryFlow.1[[i]] <- data.table(Mean.Vel.E, Mean.Vel.N, depth, Vel.E, Vel.N, Vel.up, Vel.error, startDepth, cellHeight, cellNumber, cellDepth, bottomCellDepth, UTM_X, UTM_Y, Longitude, Latitude, Altitude, distance, sampleNum)
     secondaryFlow.1[[i]]$transectName <- transectNames[[i]]
   }
   
   #row bind ADCP data compiled from each transect into a single data.table
   secondaryFlow <- do.call("rbind", secondaryFlow.1)
   
-  secondaryFlow <- secondaryFlow[cellDepth<depth,,] 
+  secondaryFlow <- secondaryFlow[cellDepth<=bottomCellDepth | is.na(bottomCellDepth) ,,]
+  secondaryFlow <- secondaryFlow[!is.na(bottomCellDepth) | !cellNumber>1 ,,]
+  secondaryFlow$depth[secondaryFlow$depth<=0] <- NA 
   
   secondaryFlow$cellID <- seq_along(secondaryFlow[[1]])
   

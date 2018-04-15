@@ -4,7 +4,7 @@
 \alias{layerAvg}
 \title{layerAvg}
 \usage{
-layerAvg(x, y, x1, x2)
+layerAvg(x, y, x1, x2, na.rm = FALSE)
 }
 \arguments{
 \item{x}{Sorted vector of the independent variable}
@@ -14,9 +14,11 @@ layerAvg(x, y, x1, x2)
 \item{x1}{Lower bound of x}
 
 \item{x2}{Upper bound of x}
+
+\item{na.rm}{If TRUE NA values are removed before computation. Default is FALSE}
 }
 \value{
-The integrated mean of y
+Returns the integrated mean of y
 }
 \description{
 Calculates the integrated mean of y within the defined bounds of x

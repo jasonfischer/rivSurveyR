@@ -52,7 +52,7 @@ process.planform <- function(data, transectNames, FUN = mean, binWidth, depthRef
       message("Calculating Bottom Velocities")
       flush.console()
       if(reference == "bottomCell") {
-        botVel <- shearVel(ve = ADCP$BC.Vel.E, vn = ADCP$BC.Vel.N, vu = ADCP$BC.Vel.Up, depth = ADCP$depth, h = ADCP$bottomCellDepth, Dc = Dc, n = n, p = p, reference = reference)
+        botVel <- shearVel(ve = ADCP$BC.Vel.E, vn = ADCP$BC.Vel.N, vu = ADCP$BC.Vel.Up, depth = ADCP$depth, bcDepth = ADCP$bottomCellDepth, Dc = Dc, n = n, p = p, reference = reference)
       } else {
         botVel <- shearVel(ve = ADCP$Mean.Vel.E, vn = ADCP$Mean.Vel.N, depth = ADCP$depth, Dc = Dc, n = n, p = p, reference = reference)
       }

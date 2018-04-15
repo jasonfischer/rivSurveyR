@@ -5,8 +5,8 @@
 #' @param transectNames	A list of transect names corresponding to the transects represented by the MATLAB files. See 'details' for additional information.
 #' @param depthReference	Defines the depth measurements to be used. The default ("unit") uses the method defined in RiverSurveyor, but \code{depthReference} can be set to use measurements from the vertical beam ("VB"), bottom-track beams ("BT"), or both ("composite").
 #' @param FUN	Function used to summarize ADCP data, default is \link{mean}
-#' @param binWidth	Width used to bin data along a transect, for summarization. Default is the mean distance between samples.
-#' @param binHeight	Depth interval used to bin data within an ensemble, for summarization. If missing, cell depth is used group cells for summarization.
+#' @param binWidth	Width used to bin data along a transect, for summarization. Default is the 95 percentile of distances between samples.
+#' @param binHeight	Depth interval used to bin data within an ensemble, for summarization. If missing, 95 percentile of cell depths is used group cells for summarization.
 #' @param project	Logical.  If TRUE (default), transect replicates are projected to a mean transect line using an orthogonal projection of the x and y coordinates. If FALSE transects are not projected to a mean transect line.
 #' @details	When assigning transectNames, order matters, the transect names must be in the same order of the MATLAB files assigned to the data argument. Ex., if the first two files in the list are Transect1a and Transect1b, which are replicates of Transect1, t first two files in the name list are "Transect1" and "Transect1".  The processing functions will spatially average and compile all data from the same transects, this tells the processing functions to average and compile these two files. Listing the names as "Transect1a" and "Transect1b" results in the transects being processed separately.  \code{transectNames} will only expect characters and names must be enclosed in "".
 #' @return	A \link[data.table]{data.table} with the transect name (transectName), the distance from the right bank (tDist), cell depth, cell id, depth averaged velocity to the east (Mean.Vel.E), depth averaged velocity to the north (Mean.Vel.N), depth, east velocity within a cell (Vel.E), north velocity within a cell (Vel.N), vertical velocity within a cell (Vel.up), error velocity within a cell (Vel.error), blanking distance or depth where measurements first begin (StartDepth), cell height, cell number within an ensemble (cell one is closest to the surface; cellNumber), cell depth, UTM x coordinates (UTM_X), UTM y coordinates (UTM_Y), longitude, latitude, heading of transect (assumes transect starts at river right), cellWidth, speed within a cell (speed), flow heading within a cell (velHeading), and cell altitude. If project = TRUE, orthogonally projected longitude, latitude, and UTM coordinates (Longitude_Proj, Latitude_Proj, UTM_X_Proj, UTM_Y_Proj) are also returned.
@@ -62,7 +62,7 @@ average.secondary <- function(data, transectNames, depthReference = "unit", proj
     
     if(missing(binWidth)==TRUE){
       sampleDistance <- ADCP[[i]][,mean(distance, na.rm = TRUE), by = sampleNum]
-      binWidth <- round(mean(diff(sampleDistance$V1), na.rm = TRUE), digits = 1)
+      binWidth <- round(quantile(diff(sampleDistance$V1), 0.95, na.rm = TRUE), digits = 1)
     } else {
     }
     ADCP[[i]] <- ADCP[[i]][,!c("distance"), with = FALSE]
@@ -71,7 +71,7 @@ average.secondary <- function(data, transectNames, depthReference = "unit", proj
     ADCP[[i]]$tDist <- round(ADCP[[i]]$tDist/binWidth) * binWidth
     
     if(missing(binHeight) == TRUE){
-      binHeight <- round(mean(ADCP[[i]]$cellHeight, na.rm = TRUE), digits = 1)
+      binHeight <- round(quantile(ADCP[[i]]$cellHeight, 0.95, na.rm = TRUE), digits = 1)
     } else {      
     }
     ADCP[[i]]$cellDepth <- round(ADCP[[i]]$cellDepth/binHeight) * binHeight

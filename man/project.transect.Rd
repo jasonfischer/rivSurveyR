@@ -9,9 +9,9 @@ project.transect(x, y, transectNames)
 \arguments{
 \item{x}{A vector of X geographic coordinates}
 
-\item{transectNames}{A vector identifying the transect corresponding to each x and y coordinate. Individual replicates should not be identified, see 'details' for additional information.}
+\item{y}{A vector of Y geographic coordinates}
 
-\item{z}{Vertical elevation  coordinates}
+\item{transectNames}{A vector identifying the transect corresponding to each x and y coordinate. Individual replicates should not be identified, see 'details' for additional information.}
 }
 \value{
 A \link[data.table]{data.table} of sample id, transect names, x coordinates fitted to an orthogonal plane (xProj), and y coordinates fitted to an orthogonal plane (yProj).
